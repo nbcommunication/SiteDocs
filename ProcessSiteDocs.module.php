@@ -151,9 +151,10 @@ class ProcessSiteDocs extends Process {
 	 *
 	 */
 	public function ___executeManual() {
-		$title = $this->wire()->sanitizer->entities1($this->getSiteName()) . ' - ' . $this->_('Manual');
+		$sanitizer = $this->wire()->sanitizer;
+		$title = $sanitizer->entities1($this->getSiteName()) . ' - ' . $this->_('Manual');
 		$this->headline($title);
-		$this->browserTitle(sprintf("%s - %s", $title, date('Y-m-d H:i:s')));
+		$this->browserTitle(str_replace(['---', '--'], '-', $sanitizer->pageName(sprintf("%s-%s", str_replace(' ', '-', $title), date('Y-m-d-H-i-s')))));
 		return '<h1 class="no-print">' . $title . '</h1>' .
 			$this->renderManual() .
 			'<div class="uk-grid uk-grid-small uk-child-width-auto no-print" data-uk-grid>' .
