@@ -516,16 +516,21 @@ class ProcessSiteDocs extends Process {
 
 			$xpath = new \DOMXPath($dom);
 
-			$_anchorLinkHeading = function($node) use (&$dom) {
+			$_anchorLinkHeading = function($dom, $node) {
 				$fragment = $dom->createDocumentFragment();
 				$fragment->appendXML('<div class="uk-position-relative sitedocs-anchor-heading">' .
-					$node->ownerDocument->saveHTML($node) .
+					$dom->saveHTML($node) .
 					'<a class="sitedocs-anchor-link" href="#' . $node->getAttribute('id') . '" aria-hidden="true">' .
 						wireIconMarkup('link') .
 					'</a>' .
 				'</div>');
-				$node->parentNode->insertBefore($fragment, $node->nextSibling);
+				if($node->nextSibling === null) {
+					$newNode = $node->parentNode->appendChild($fragment);
+				} else {
+					$newNode = $node->parentNode->insertBefore($fragment, $node->nextSibling);
+				}
 				$node->parentNode->removeChild($node);
+				return $newNode;
 			};
 
 			// Top-level query: all h2 elements
@@ -541,7 +546,7 @@ class ProcessSiteDocs extends Process {
 				$h2->setAttribute('id', $h2Id);
 
 				if($userCanEdit) {
-					$_anchorLinkHeading($h2);
+					$h2 = $_anchorLinkHeading($dom, $h2);
 				}
 
 				$children = [];
@@ -572,7 +577,7 @@ class ProcessSiteDocs extends Process {
 					$h3->setAttribute('id', $h3Id);
 
 					if($userCanEdit) {
-						$_anchorLinkHeading($h3);
+						$_anchorLinkHeading($dom, $h3);
 					}
 
 					$children[] = [
