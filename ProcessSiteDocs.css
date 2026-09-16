@@ -1,0 +1,252 @@
+/**
+ * ProcessSiteDocs.css
+ *
+ * Auto-loaded by ProcessWire alongside ProcessSiteDocs.module.php.
+ * Styles the Site Docs admin screens and the print manual.
+ *
+ */
+
+.ProcessSiteDocs #pw-content-head-buttons,
+.ProcessSiteDocs #pw-content-title {
+	display: none;
+}
+
+.ProcessSiteDocs .uk-sticky {
+	z-index: 92 !important;
+}
+
+.sitedocs-page-content h2.uk-h1 {
+	transform: translateY(-6px);
+}
+
+#sitedocs-mobile-nav {
+	z-index: 99999 !important;
+}
+
+.sitedocs-prevnext a {
+	color: var(--pw-text-color, #354b60);
+	gap: 15px;
+}
+
+.sitedocs-prevnext a:hover {
+	color: var(--pw-main-color, #e83561);
+	text-decoration: none;
+}
+
+.sitedocs-prevnext span.uk-text-meta ~ span {
+	font-size: 1.1em;
+}
+
+.sitedocs-manual {
+	display: none;
+}
+
+.sitedocs-anchor-heading {
+	margin-bottom: 20px;
+}
+
+.sitedocs-anchor-heading h2,
+.sitedocs-anchor-heading h3 {
+	display: inline;
+	margin-bottom: 0;
+}
+
+.sitedocs-anchor-link {
+	display: inline-flex;
+	font-size: 1em;
+	align-items: center;
+	justify-content: center;
+	margin-left: 0.4em;
+	vertical-align: middle;
+	opacity: 0;
+	color: inherit;
+	text-decoration: none !important;
+	transition: opacity 256ms ease;
+	transform: translateY(-25%);
+}
+.sitedocs-anchor-heading:hover .sitedocs-anchor-link {
+	opacity: 0.5;
+}
+
+.sitedocs-anchor-heading:hover .sitedocs-anchor-link:hover,
+.sitedocs-anchor-heading:hover .sitedocs-anchor-link:focus {
+	opacity: 1;
+}
+
+@media print {
+
+	.sitedocs-manual {
+		display: block;
+	}
+
+	.no-print,
+	#pw-mastheads,
+	#notices,
+	#pw-content-head,
+	#pw-footer,
+	.pw-panel-container,
+	.sitedocs-anchor-link {
+		display: none !important;
+	}
+
+
+	html, body {
+		margin: 0;
+		padding: 0;
+	}
+
+	@page {
+		size: A4;
+		margin: 2.5cm 2cm;
+	}
+
+	.sitedocs-manual {
+		font-size: 11pt;
+		line-height: 1.5;
+		color: #000;
+	}
+
+	.sitedocs-splash {
+		text-align: center;
+	}
+
+	.sitedocs-splash-banner {
+		margin: 0 auto 1.5em;
+		max-width: 70%;
+	}
+
+	.sitedocs-splash-banner img {
+		max-width: 100%;
+		height: auto;
+	}
+
+	.sitedocs-splash h1 {
+		font-size: 24pt;
+		margin: 0 0 0.5em;
+	}
+
+	.sitedocs-splash p {
+		margin: 0.2em 0;
+		color: #444;
+		font-size: 10pt;
+	}
+
+	/* ---------- Table of contents ---------- */
+
+	.sitedocs-toc h2 {
+		font-size: 16pt;
+		margin-bottom: 0.75em;
+	}
+
+	.sitedocs-intro {
+		margin-bottom: 1.5em;
+		font-style: italic;
+		color: #333;
+	}
+
+	.sitedocs-toc ul {
+		list-style: none;
+		padding-left: 0;
+	}
+
+	.sitedocs-toc ul ul {
+		padding-left: 1.25em;
+	}
+
+	.sitedocs-nav-item {
+		margin: 0.3em 0;
+	}
+
+	.sitedocs-nav-item > a {
+		text-decoration: none;
+		color: inherit;
+	}
+
+	/* Top-level entries get a bit more weight */
+	.sitedocs-toc > ul > .sitedocs-nav-item > a {
+		font-weight: bold;
+	}
+
+	/* Parent items with no real link (just a section grouping) shouldn't
+		look clickable */
+	.sitedocs-toc a[href=""] {
+		cursor: default;
+	}
+
+	/* ---------- Content sections ---------- */
+	/* Every top-level section (chapter) starts on a new page, except the
+		splash/TOC which already forced their own breaks above. */
+	.sitedocs-manual > section + section {
+		break-before: page;
+	}
+
+	.sitedocs-manual-section h2 {
+		font-size: 20pt;
+		break-after: avoid;
+		margin-top: 0;
+	}
+
+	.sitedocs-manual-section h3 {
+		font-size: 16pt;
+		break-after: avoid;
+	}
+
+	.sitedocs-manual-section h4 {
+		font-size: 14pt;
+		break-after: avoid;
+	}
+
+	.sitedocs-manual-section h5 {
+		font-size: 13pt;
+		break-after: avoid;
+	}
+
+	.sitedocs-manual-section h6 {
+		font-size: 12pt;
+		break-after: avoid;
+	}
+
+	.sitedocs-manual p,
+	.sitedocs-manual ul,
+	.sitedocs-manual ol {
+		orphans: 3;
+		widows: 3;
+	}
+
+	/* ---------- Code blocks ---------- */
+	.sitedocs-manual pre {
+		background: #f4f4f4;
+		border: 1px solid #ddd;
+		padding: 0.75em 1em;
+		font-family: "Courier New", monospace;
+		font-size: 9pt;
+		line-height: 1.4;
+		white-space: pre-wrap;
+		word-break: break-word;
+		break-inside: avoid;
+	}
+
+	.sitedocs-manual code {
+		font-family: "Courier New", monospace;
+		font-size: 9pt;
+	}
+
+	.sitedocs-manual p code {
+		background: #f0f0f0;
+		padding: 0.1em 0.3em;
+	}
+
+	/* ---------- Links ---------- */
+	/* Internal anchor links (#sitedocs-XXXX) shouldn't print a URL — only
+		expand genuine external links if any appear in body content. */
+	.sitedocs-manual a[href^="http"]::after {
+		content: " (" attr(href) ")";
+		font-size: 0.8em;
+		color: #555;
+	}
+
+	.sitedocs-manual a[href^="#"]::after {
+		content: "";
+	}
+}
+
