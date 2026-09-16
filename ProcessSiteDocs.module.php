@@ -593,7 +593,41 @@ class ProcessSiteDocs extends Process {
 				];
 			}
 
+			// Add styling classes to all tables
+			$tables = $dom->getElementsByTagName('table');
+			foreach($tables as $table) {
+				$table->setAttribute('class', trim(($table->getAttribute('class') . ' uk-table sitedocs-content-table')));
+			}
+
+			// Wrap all tables in <div class="uk-overflow-auto">
+			foreach($tables as $table) {
+				$wrapper = $dom->createElement('div');
+				$wrapper->setAttribute('class', 'uk-overflow-auto');
+				$table->parentNode->insertBefore($wrapper, $table);
+				$wrapper->appendChild($table);
+			}
+
 			$content = $this->domSave($dom);
+		}
+
+		$children = $this->pageChildren($thisPage);
+		if($children->count()) {
+
+			$sectionHeading = $isView ? $this->_('In this section') : $this->_('Table of Contents');
+			$sectionId = $sanitizer->pageName($sectionHeading);
+
+			$content .= '<h2 id="' . $sectionId . '">' . $sectionHeading . '</h2>';
+			$content .= '<ul>';
+			foreach($children as $child) {
+				$content .= '<li><a href="' . $child->urlViewSiteDoc . '">' . $sanitizer->entities1($child->getFormatted('title')) . '</a></li>';
+			}
+			$content .= '</ul>';
+
+			$onPageNavItems[] = [
+				'id' => $sectionId,
+				'title' => $sectionHeading,
+				'children' => [],
+			];
 		}
 
 		$onPageNav = '';
@@ -610,20 +644,6 @@ class ProcessSiteDocs extends Process {
 				'<a href="#' . $item['id'] . '">' . $sanitizer->entities1($item['title']) . '</a>' .
 				$onPageSubNav .
 			'</li>';
-		}
-
-		$children = $this->pageChildren($thisPage);
-		if($children->count()) {
-
-			$content .= '<h2>' . ($isView ?
-				$this->_('In this section') :
-				$this->_('Table of Contents')
-			) . '</h2>';
-			$content .= '<ul>';
-			foreach($children as $child) {
-				$content .= '<li><a href="' . $child->urlViewSiteDoc . '">' . $sanitizer->entities1($child->getFormatted('title')) . '</a></li>';
-			}
-			$content .= '</ul>';
 		}
 
 		if(!$isView) {
