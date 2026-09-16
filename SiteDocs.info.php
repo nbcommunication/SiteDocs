@@ -10,7 +10,7 @@
 $info = [
 	'title' => 'Site Docs',
 	'summary' => 'Implements internal site documentation management.',
-	'version' => 2,
+	'version' => 3,
 	'author' => 'nbcommunication',
 	'href' => 'https://github.com/nbcommunication/SiteDocs',
 	'icon' => 'question-circle',

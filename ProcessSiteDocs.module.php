@@ -196,19 +196,25 @@ class ProcessSiteDocs extends Process {
 	 *
 	 */
 	public function ___renderIndex() {
+		$image = $this->renderIndexImage();
+		return $this->renderView(
+			($image ? '<div class="sitedocs-banner">' . $image . '</div>' : '') .
+			$this->siteDocs->getContent($this->siteDocs->getIndexPage())
+		);
+	}
 
-		$pageIndex = $this->siteDocs->getIndexPage();
-
-		$out = '';
-
-		if($pageIndex->images->count()) {
-			$image = $pageIndex->images->first();
-			$out .= '<div class="sitedocs-banner">' . $image->render() . '</div>';
+	/**
+	 * Render the index page image
+	 *
+	 * @return string
+	 *
+	 */
+	public function ___renderIndexImage() {
+		$image = $this->getIndexImage();
+		if($image) {
+			return $image->render();
 		}
-
-		$out .= $this->siteDocs->getContent($pageIndex);
-
-		return $this->renderView($out);
+		return '';
 	}
 
 	/**
@@ -231,22 +237,20 @@ class ProcessSiteDocs extends Process {
 		$out = '<div class="sitedocs-manual">';
 
 			// splash page
+			$image = $this->renderIndexImage();
 			$out .= "<section class='sitedocs-splash'>";
-			if($pageIndex->images->count()) {
-				$image = $pageIndex->images->first();
-				$out .= '<div class="sitedocs-splash-banner">' . $image->render() . '</div>';
-			}
-			$out .= "<h1>" . $sanitizer->entities1($siteName) . "</h1>";
-			$out .= "<p>" . $sanitizer->entities1($this->wire()->pages->get('/')->httpUrl) . "</p>";
-			$out .= "<p>" . sprintf($this->_('Generated %s'), date('Y-m-d H:i')) . "</p>";
+				$out .= $image ? '<div class="sitedocs-splash-banner">' . $image . '</div>' : '';
+				$out .= "<h1>" . $sanitizer->entities1($siteName) . "</h1>";
+				$out .= "<p>" . $sanitizer->entities1($this->wire()->pages->get('/')->httpUrl) . "</p>";
+				$out .= "<p><small>" . sprintf($this->_('Generated %s'), date('Y-m-d H:i')) . "</small></p>";
 			$out .= "</section>";
 
 			// introduction + TOC
 			$out .= "<section class='sitedocs-toc'>";
-			$content = $siteDocs->getContent($pageIndex);
-			if($content) $out .= "<div class='sitedocs-intro'>{$content}</div>";
-			$out .= "<h2>" . $this->_('Table of Contents') . "</h2>";
-			$out .= '<ul>' . $this->renderNav($this->siteDocsNav, true) . '</ul>';
+				$content = $siteDocs->getContent($pageIndex);
+				if($content) $out .= "<div class='sitedocs-intro'>{$content}</div>";
+				$out .= "<h2>" . $this->_('Table of Contents') . "</h2>";
+				$out .= '<ul>' . $this->renderNav($this->siteDocsNav, true) . '</ul>';
 			$out .= "</section>";
 
 			foreach($this->pageChildren($pageIndex) as $child) {
@@ -777,13 +781,27 @@ class ProcessSiteDocs extends Process {
 		return $this;
 	}
 
+	/*
+	 * Get the first image from the index page
+	 *
+	 * @return Pageimage|null
+	 *
+	 */
+	public function ___getIndexImage() {
+		$pageIndex = $this->siteDocs->getIndexPage();
+		if($pageIndex->images->count()) {
+			return $pageIndex->images->first();
+		}
+		return null;
+	}
+
 	/**
 	 * Get the site name
 	 *
 	 * @return string
 	 *
 	 */
-	public function getSiteName() {
+	public function ___getSiteName() {
 		return $this->siteName ?: $this->wire()->config->httpHost;
 	}
 

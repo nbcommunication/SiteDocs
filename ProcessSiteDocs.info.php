@@ -10,7 +10,7 @@
 $info = [
 	'title' => 'Site Docs',
 	'summary' => 'Manage and browse internal site documentation.',
-	'version' => 2,
+	'version' => 3,
 	'author' => 'nbcommunication',
 	'icon' => 'book',
 	'requires' => 'SiteDocs',

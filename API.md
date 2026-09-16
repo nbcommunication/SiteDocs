@@ -114,6 +114,48 @@ public function pageAllowedRoles(Page $page) {
 
 Important: module-level access still depends on the normal ProcessWire permission model. The `ProcessSiteDocs` module requires the `page-edit` permission by configuration.
 
+## `ProcessSiteDocs` initialization and caching
+
+`ProcessSiteDocs::init()` performs two important setup steps before rendering any docs view:
+
+1. It resolves the `SiteDocs` module instance and loads any configured custom CSS/JS files.
+2. It builds a per-user navigation cache for the accessible docs tree.
+
+```php
+$processSiteDocs->init();
+```
+
+Custom asset behavior:
+
+- `customCssFile` and `customJsFile` are checked on init
+- paths containing `..` are rejected to prevent traversal
+- only `.css` or `.js` files are accepted
+- files are only added if they exist on disk under the site root
+- the URL is attached to ProcessWire's script/style stacks via `$config->styles` / `$config->scripts`
+
+Navigation cache behavior:
+
+```php
+$cacheName = ['nav'];
+foreach($user->roles->sort('id') as $role) {
+    $cacheName[] = $role->id;
+}
+if(isset($user->language)) {
+    $cacheName[] = $user->language->name;
+}
+
+$this->siteDocsNav = $this->wire()->cache->getFor(
+    $this,
+    implode('-', $cacheName),
+    'template=' . SiteDocs::templateIndex . '|' . SiteDocs::templatePage,
+    function() {
+        // build menu tree for this user's accessible docs pages
+    }
+);
+```
+
+The cached data is built from the visible children of the docs index page using `menuItem()` and is filtered with `filterItems()`, which removes pages the current user cannot view.
+
 ## `SiteDocs` public methods
 
 ```php
@@ -163,19 +205,50 @@ The render methods are all hookable via the `___` prefix:
 
 ```php
 $processSiteDocs->renderIndex();
+$processSiteDocs->renderIndexImage();
 $processSiteDocs->renderManual();
 $processSiteDocs->renderManualPage(Page $page, $depth = 2);
 $processSiteDocs->renderNav(array $items, bool $isManual = false);
 $processSiteDocs->renderPage(?Page $page = null);
 $processSiteDocs->renderView($content = '');
+$processSiteDocs->getIndexImage();
+$processSiteDocs->getSiteName();
+$processSiteDocs->errorRedirect($text, $flags = 0);
 ```
 
 Behavior summary:
 
+- `renderIndex()` renders the docs landing page with the optional banner image from the index page
+- `renderIndexImage()` returns the rendered image from `getIndexImage()` on the docs index page, if present
 - `renderManual()` builds a splash section, intro text, TOC, and each accessible top-level docs page recursively
-- `renderManualPage()` rewrites heading levels to preserve hierarchy while nesting content
+- `renderManualPage()` rewrites heading levels to preserve hierarchy while nesting content and appends child sections recursively
 - `renderNav()` renders the docs navigation as either interactive UIkit markup or a plain anchor list for the manual TOC
+- `renderPage()` renders and wraps the main content of a single docs page
 - `renderView()` builds the page chrome, breadcrumbs, side nav, on-page heading nav, prev/next navigation, and edit/add controls
+- `getIndexImage()` returns the first `images` item on the docs index page, if present
+- `getSiteName()` falls back to `$config->httpHost` when the configured site name is empty
+- `errorRedirect()` adds the error to the session and redirects back to the docs root process page
+
+### Examples
+
+In `/site/templates/admin.php`:
+
+```php
+// Set the site name for the SiteDocs module
+$wire->addHookAfter('ProcessSiteDocs::getSiteName', function(HookEvent $event) use ($config) {
+	$event->return = $event->object->siteName ?: setting('siteName') ?: $config->httpHost;
+});
+
+// Use the site logo for the SiteDocs module index image if empty
+$wire->addHookAfter('ProcessSiteDocs::getIndexImage', function(HookEvent $event) use ($pages) {
+	if(!$event->return) {
+		$pageHome = $pages->get(1);
+		if($pageHome->logo->count) {
+			$event->return = $pageHome->logo->first();
+		}
+	}
+});
+```
 
 ## Navigation data structure
 
@@ -193,7 +266,9 @@ The docs navigation is cached per user role/language and stored as a plain array
 ]
 ```
 
-`menuItem()` builds this structure recursively from the visible children of each docs page.
+`menuItem()` builds this structure recursively from the visible children of each docs page, and it marks `hasContent` based on whether the page has non-empty body content.
+
+`filterItems()` removes items the current user cannot view before they are rendered in the nav or used for prev/next links. `pageChildren()` wraps that logic for a page's direct children.
 
 ## Configuration API
 

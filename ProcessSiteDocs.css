@@ -23,6 +23,10 @@
 	z-index: 99999 !important;
 }
 
+.sitedocs-banner {
+	margin: 2em 0;
+}
+
 .sitedocs-prevnext a {
 	color: var(--pw-text-color, #354b60);
 	gap: 15px;
@@ -35,10 +39,6 @@
 
 .sitedocs-prevnext span.uk-text-meta ~ span {
 	font-size: 1.1em;
-}
-
-.sitedocs-manual {
-	display: none;
 }
 
 .sitedocs-anchor-heading {
@@ -71,6 +71,10 @@
 .sitedocs-anchor-heading:hover .sitedocs-anchor-link:hover,
 .sitedocs-anchor-heading:hover .sitedocs-anchor-link:focus {
 	opacity: 1;
+}
+
+.sitedocs-manual {
+	display: none;
 }
 
 @media print {
@@ -111,7 +115,7 @@
 	}
 
 	.sitedocs-splash-banner {
-		margin: 0 auto 1.5em;
+		margin: 0 auto 5em;
 		max-width: 70%;
 	}
 
