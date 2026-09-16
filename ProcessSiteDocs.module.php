@@ -91,15 +91,6 @@ class ProcessSiteDocs extends Process {
 				return $siteDocsNav;
 			}
 		);
-
-		// Add the print-friendly manual to the navigation
-		$this->siteDocsNav[] = [
-			'id' => -1,
-			'url' => "{$this->wire()->page->url}manual/",
-			'title' => $this->_('Print Manual'),
-			'items' => [],
-			'hasContent' => false,
-		];
 	}
 
 	/**
@@ -624,6 +615,16 @@ class ProcessSiteDocs extends Process {
 				$content .= '<li><a href="' . $child->urlViewSiteDoc . '">' . $sanitizer->entities1($child->getFormatted('title')) . '</a></li>';
 			}
 			$content .= '</ul>';
+		}
+
+		if(!$isView) {
+			// Add the print manual button
+			$content .= '<div class="uk-margin-medium-top no-print">' .
+				'<a href="' . $this->wire()->page->url . 'manual/" class="uk-button uk-button-primary">' .
+					wireIconMarkup('print') . ' ' .
+					$this->_('Print Manual') .
+				'</a>' .
+			'</div>';
 		}
 
 		$content = '<div class="uk-margin-medium-bottom sitedocs-page-content-page">' . $content . '</div>';
