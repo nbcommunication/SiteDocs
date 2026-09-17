@@ -465,6 +465,13 @@ class ProcessSiteDocs extends Process {
 		// are added to the content further down.
 		$userCanEdit = $thisPage->editable();
 
+		// Check which admin theme is being used
+		$adminThemeNew = false;
+		$adminTheme = $this->wire()->config->adminTheme;
+		if(isset($adminTheme->themeName) && $adminTheme->themeName === 'default') {
+			$adminThemeNew = true;
+		}
+
 		// Set the page title and headline
 		// Headline is hidden but still set for accessibility purposes
 		$indexTitle = $sanitizer->entities1($pageIndex->title);
@@ -596,7 +603,7 @@ class ProcessSiteDocs extends Process {
 			// Add styling classes to all tables
 			$tables = $dom->getElementsByTagName('table');
 			foreach($tables as $table) {
-				$table->setAttribute('class', trim(($table->getAttribute('class') . ' uk-table uk-table-justify sitedocs-content-table')));
+				$table->setAttribute('class', trim(($table->getAttribute('class') . ' uk-table sitedocs-content-table')));
 			}
 
 			// Wrap all tables in <div class="uk-overflow-auto">
@@ -735,6 +742,8 @@ class ProcessSiteDocs extends Process {
 			'</div>';
 		}
 
+		$stickyOffset = $adminThemeNew ? '80' : '20';
+
 		return '<div class="sitedocs-page uk-margin-top">' .
 			'<div class="uk-grid" data-uk-grid>' .
 				'<div class="uk-width-1-1 uk-hidden@m no-print">' .
@@ -744,7 +753,7 @@ class ProcessSiteDocs extends Process {
 					'</button>' .
 				'</div>' .
 				'<div class="uk-width-1-4@m uk-visible@m no-print">' .
-					'<div class="sitedocs-nav uk-sticky uk-overflow-auto" data-uk-sticky="offset: 80; media: 640; bottom: #content">' .
+					'<div class="sitedocs-nav uk-sticky uk-overflow-auto" data-uk-sticky="offset: ' . $stickyOffset . '; media: 640; bottom: #content">' .
 						$nav .
 					'</div>' .
 				'</div>' .
@@ -761,7 +770,7 @@ class ProcessSiteDocs extends Process {
 				'</div>' .
 				'<div class="uk-width-1-5@m uk-visible@m no-print">' .
 					($onPageNav ?
-						'<div class="sitedocs-page-nav uk-sticky" data-uk-sticky="offset: 80; media: 960; bottom: #content">' .
+						'<div class="sitedocs-page-nav uk-sticky" data-uk-sticky="offset: ' . $stickyOffset . '; media: 960; bottom: #content">' .
 							'<ul class="uk-nav uk-nav-default" data-uk-scrollspy-nav="closest: li; scroll: true; offset: 20; overflow: true">' .
 								'<li class="uk-nav-header">' . $this->_('On this page') . '</li>' .
 								'<ul class="uk-nav-sub">' .
@@ -776,7 +785,7 @@ class ProcessSiteDocs extends Process {
 		'</div>' .
 		'<div id="sitedocs-mobile-nav" class="uk-modal-full" data-uk-modal>' .
 			'<div class="uk-modal-dialog uk-height-1-1">' .
-				'<button class="uk-modal-close-full" type="button" uk-close></button>' .
+				'<button class="uk-modal-close-full uk-close-large" type="button" uk-close></button>' .
 				'<div class="uk-modal-body uk-height-1-1" data-uk-overflow-auto>' .
 					'<div class="uk-modal-title uk-margin-bottom">' .
 						$title .
