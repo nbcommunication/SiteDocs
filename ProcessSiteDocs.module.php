@@ -596,7 +596,7 @@ class ProcessSiteDocs extends Process {
 			// Add styling classes to all tables
 			$tables = $dom->getElementsByTagName('table');
 			foreach($tables as $table) {
-				$table->setAttribute('class', trim(($table->getAttribute('class') . ' uk-table sitedocs-content-table')));
+				$table->setAttribute('class', trim(($table->getAttribute('class') . ' uk-table uk-table-justify sitedocs-content-table')));
 			}
 
 			// Wrap all tables in <div class="uk-overflow-auto">
