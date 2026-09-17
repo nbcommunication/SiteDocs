@@ -603,13 +603,13 @@ class ProcessSiteDocs extends Process {
 			// Add styling classes to all tables
 			$tables = $dom->getElementsByTagName('table');
 			foreach($tables as $table) {
-				$table->setAttribute('class', trim(($table->getAttribute('class') . ' uk-table sitedocs-content-table')));
+				$table->setAttribute('class', trim(($table->getAttribute('class') . ' uk-table uk-table-divider sitedocs-content-table')));
 			}
 
-			// Wrap all tables in <div class="uk-overflow-auto">
+			// Wrap all tables
 			foreach($tables as $table) {
 				$wrapper = $dom->createElement('div');
-				$wrapper->setAttribute('class', 'uk-overflow-auto');
+				$wrapper->setAttribute('class', 'uk-overflow-auto uk-margin-medium-top uk-margin-medium-bottom');
 				$table->parentNode->insertBefore($wrapper, $table);
 				$wrapper->appendChild($table);
 			}
